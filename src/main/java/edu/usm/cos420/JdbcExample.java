@@ -107,20 +107,21 @@ public class JdbcExample {
 	public static void addToTable(Connection con, String tableName) throws SQLException
 	{
 	    Statement st = null;
-	
-		st = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+
+	    st = con.createStatement();
+	      
+	    String sql = "INSERT INTO " + tableName + " VALUES (1, 'Jorn', 'Klungsoyr', 'Ghana')";
+	    st.executeUpdate(sql);
+		
+	    // scrollable datasets allow you to march through a set of records iteratively
+	    // here, we insert a record 
+	    
+	    st = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 
         ResultSet uprs = st.executeQuery("SELECT * FROM " + tableName);
 
 		uprs.moveToInsertRow();
-  	
-		uprs.updateInt("userId", 1);
-		uprs.updateString("firstName", "Jorn");
-		uprs.updateString("lastName", "Klungsoyr");
-		uprs.updateString("countryCode", "Ghana");
-
-		uprs.insertRow();
-
+		
 		uprs.updateInt("userId", 2);
 		uprs.updateString("firstName", "Sally");
 		uprs.updateString("lastName", "Saviour");
@@ -144,10 +145,12 @@ public class JdbcExample {
 		rs = st.executeQuery("SELECT userID, firstName, lastName, countryCode FROM " + tableName);
 
 		while(rs.next()) {
+			// can retrieve by position
 			int userId = rs.getInt(1);
-			String firstName = rs.getString(2);
+			// or by column name 
+			String firstName = rs.getString("firstname");
 			String lastName = rs.getString(3);
-			String countryCode = rs.getString(4);
+			String countryCode = rs.getString("countryCode");
 
 			System.out.println(userId + ". " + lastName + ", " +
 					firstName + " (" + countryCode + ")");
